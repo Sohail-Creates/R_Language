@@ -1,0 +1,197 @@
+========================================================
+LAB 6 - CHEAT SHEET: Handling Imbalanced Iris Dataset + Decision Tree
+========================================================
+
+Author: Sohail
+Goal: Prepare for Lab Final Exam (without internet)
+
+========================================================
+[ Step 1 ] Install and Load Required Libraries
+========================================================
+
+Packages Installed:
+- ROSE: For random oversampling
+- DMwR2: For SMOTE (alternative to DMwR)
+- caret: For model training and cross-validation
+- rpart: For decision tree modeling
+- ggplot2: For plotting and visualization
+- smotefamily: For alternative SMOTE usage
+- pROC: For ROC and AUC curve drawing
+
+Functions Used:
+- install.packages(c(...)) — To install multiple packages
+- library(...) — To load the installed package into memory
+
+Check Installed Packages:
+- Use `installed.packages()` and compare with required list.
+
+Error Faced:
+- DMwR (old) package was not working, solved by using DMwR2 or smotefamily.
+
+========================================================
+[ Step 2 ] Create an Imbalanced Dataset
+========================================================
+
+Dataset Used:
+- Built-in `iris` dataset (150 rows, 3 species).
+
+Steps:
+1. Kept only 20% of the 'setosa' species data (10 rows).
+2. Kept all rows from 'versicolor' and 'virginica' (50 each).
+3. Combined them to create an imbalanced dataset (110 rows).
+
+Function/Command:
+- subset, sample(), rbind()
+
+Important Points:
+- Set seed using `set.seed(123)` to ensure reproducibility.
+- Created new column 'Label' to convert multiclass → binary classification:
+    - 1 = setosa
+    - 0 = others
+
+Problem Solved:
+- ROSE needs binary target variable, not 3 classes → converted to binary.
+
+========================================================
+[ Step 3 ] Handle Imbalanced Data using ROSE
+========================================================
+
+Technique:
+- Random Oversampling and Undersampling using ROSE.
+
+Function:
+- ovun.sample(formula, data, method, N)
+
+Important Parameters:
+- method = "both" → Does both oversampling (for minority) and undersampling (for majority).
+- N = Total number of new samples after resampling (here N = 150).
+
+Output:
+- Balanced number of 1's (setosa) and 0's (others).
+
+Error/Problem:
+- ROSE works only for binary classification. 
+- We handled it by converting dataset into binary before applying ROSE.
+
+========================================================
+[ Step 4 ] Build a Decision Tree Model
+========================================================
+
+Algorithm:
+- Decision Tree Classifier (using CART method).
+
+Function:
+- rpart(Label ~ ., data, method = "class")
+
+Important Parameters:
+- method = "class" → Specifies classification (not regression).
+
+Output:
+- Decision tree built on balanced data.
+- Summary printed tree statistics like splits and node information.
+
+========================================================
+[ Step 5 ] Evaluate Model Performance
+========================================================
+
+Prediction:
+- predict(model, newdata, type = "class")
+
+Confusion Matrix:
+- confusionMatrix(predictions, actual_labels)
+
+Performance Metrics Extracted:
+- Accuracy
+- Sensitivity (Recall for Positive Class)
+- Specificity (Recall for Negative Class)
+
+Notes:
+- Convert predictions and labels to factors with the same levels before passing to confusionMatrix().
+
+========================================================
+[ Step 6 ] Draw ROC Curve and Calculate AUC
+========================================================
+
+ROC Curve:
+- Used to visualize model performance at various threshold settings.
+
+Function:
+- roc(response, predictor)
+
+Plot:
+- plot(roc_curve, main = "ROC Curve for Decision Tree")
+
+AUC:
+- auc(roc_curve)
+- Measures total area under ROC curve (closer to 1 is better).
+
+========================================================
+[ Step 7 ] Hyperparameter Tuning of Decision Tree
+========================================================
+
+Goal:
+- Tune the 'cp' (Complexity Parameter) of the Decision Tree using cross-validation.
+
+Function:
+- train(Label ~ ., data, method = "rpart", tuneGrid, trControl)
+
+Important Points:
+- tuneGrid: Expanded grid of cp values from 0.01 to 0.1
+- trControl: Used cross-validation ("cv")
+
+After Best cp Found:
+- Retrained decision tree model with best cp.
+- Evaluated again using confusion matrix.
+
+========================================================
+[ Step 8 ] Feature Importance
+========================================================
+
+Function:
+- varImp(model, scale = FALSE)
+
+Purpose:
+- Identify which features (Sepal.Length, Sepal.Width, Petal.Length, Petal.Width) are most important for decision making in tree.
+
+========================================================
+Important Errors Faced and Their Solutions
+========================================================
+
+Error 1:
+- ROSE Error: "Response variable must have 2 levels."
+Solution: Converted multiclass to binary classification.
+
+Error 2:
+- DMwR Package not working properly.
+Solution: Switched to DMwR2 or smotefamily for SMOTE if needed.
+
+Error 3:
+- Confusion Matrix mismatch.
+Solution: Made sure both prediction and true label vectors were factors with the same levels.
+
+========================================================
+Paper Writing Important Points to Remember
+========================================================
+
+- Always mention the dataset used (iris).
+- Always mention "we converted multiclass to binary before oversampling".
+- Always mention ROSE method for balancing and Decision Tree for classification.
+- Always mention that tuning was done using caret's train() function with cross-validation.
+- ROC curve and AUC are used for evaluating classification models.
+- Feature Importance tells which input variables are most influential.
+
+========================================================
+Final Quick Tips for Lab Paper
+========================================================
+
+1. Mention dataset imbalance first.
+2. Mention binary conversion.
+3. Explain ROSE method clearly (random over/under sampling).
+4. Mention Decision Tree and tuning cp.
+5. Draw/mention Confusion Matrix and metrics.
+6. Draw ROC curve, mention AUC.
+7. End by mentioning Feature Importance.
+
+========================================================
+END OF CHEAT SHEET
+========================================================
